@@ -14,8 +14,27 @@ app.get("/", (req, res) => {
   res.status(200).send("Hello, world!");
 });
 
+function filterUserData(users, filter, value) {
+  const lowerValue = value.toLowerCase();
+  return users.filter((user) => {
+    const userValue = user[filter].toLowerCase();
+
+    if (filter === "gender") {
+      return userValue === lowerValue;
+    } else {
+      return userValue.includes(lowerValue);
+    }
+  });
+}
+
 app.get("/users", (req, res) => {
-  res.status(200).send(USER_DATA);
+  const {
+    query: { filter, value },
+  } = req;
+  if (!filter || !value) res.status(200).send(USER_DATA);
+  else if (filter in USER_DATA[0])
+    res.status(200).send(filterUserData(USER_DATA, filter, value));
+  else res.status(404).send({ message: `"${filter}" filter does not exist` });
 });
 
 app.get("/users/:id", (req, res) => {
@@ -25,7 +44,13 @@ app.get("/users/:id", (req, res) => {
 });
 
 app.get("/products", (req, res) => {
-  res.status(200).send(PRODUCTS_DATA);
+  const {
+    query: { filter, value },
+  } = req;
+  if (!filter || !value) res.status(200).send(PRODUCTS_DATA);
+  else if (filter in PRODUCTS_DATA[0])
+    res.status(200).send(filterUserData(PRODUCTS_DATA, filter, value));
+  else res.status(404).send({ message: `"${filter}" filter does not exist` });
 });
 
 app.get("/products/:id", (req, res) => {
