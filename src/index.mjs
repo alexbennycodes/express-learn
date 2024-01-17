@@ -6,6 +6,8 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
+
 app.listen(PORT, () => {
   console.log(`Running on port ${PORT}`);
 });
@@ -35,6 +37,13 @@ app.get("/users", (req, res) => {
   else if (filter in USER_DATA[0])
     res.status(200).send(filterUserData(USER_DATA, filter, value));
   else res.status(404).send({ message: `"${filter}" filter does not exist` });
+});
+
+app.post("/users", (req, res) => {
+  console.log(req.body);
+  const newUser = { id: USER_DATA.length + 1, ...req.body };
+  USER_DATA.push(newUser);
+  return res.status(200).send(newUser);
 });
 
 app.get("/users/:id", (req, res) => {
